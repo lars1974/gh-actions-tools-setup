@@ -1,6 +1,8 @@
 const core = require('@actions/core')
 const { wait } = require('./wait')
 const tc = require('@actions/tool-cache')
+const cache = require('@actions/cache');
+import fs from 'fs';
 
 /**
  * The main function for the action.
@@ -29,11 +31,22 @@ async function run() {
 }
 
 async function downloadHelm() {
-  const helmURL = 'https://get.helm.sh/helm-v3.14.1-linux-amd64.tar.gz'
-  const helmPath = await tc.downloadTool(helmURL)
-  const helmExtractedFolder = await tc.extractTar(helmPath, 'tools/helm/3.14.1')
-  const cachedPath = await tc.cacheDir(helmExtractedFolder, 'helm', '3.14.1')
+
+  await cache.restoreCache(["tools/helm/3.14.1"], "helm-3.14.1-linux-amd64", [])
+  if(await cache.restoreCache(["tools/helm/3.14.1"], "helm-3.14.1-linux-amd64", []) === undefined){
+    core.info("Cache not found, downloading helm")
+    const helmURL = 'https://get.helm.sh/helm-v3.14.1-linux-amd64.tar.gz'
+    const helmPath = await tc.downloadTool(helmURL)
+    await tc.extractTar(helmPath, 'tools/helm/3.14.1')
+
+  }
+  else {
+    core.info("Cache found, using cached helm")
+  }
+  const cachedPath = await tc.cacheDir('tools/helm/3.14.1', 'helm', '3.14.1')
+  await cache.saveCache(["tools/helm/3.14.1"], "helm-3.14.1-linux-amd64")
   core.addPath(`${cachedPath}/linux-amd64`)
+
 }
 
 async function downloadJava() {
@@ -42,6 +55,7 @@ async function downloadJava() {
   const path = await tc.downloadTool(url)
   const extractedFolder = await tc.extractTar(path, 'tools/java/21.0.2')
   const cachedPath = await tc.cacheDir(extractedFolder, 'java', '21.0.2')
+
   core.addPath(`${cachedPath}/jdk-21.0.2/bin`)
   core.exportVariable('JAVA_HOME', `${cachedPath}/jdk-21.0.2/`)
 }
