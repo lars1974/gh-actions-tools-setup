@@ -42,7 +42,7 @@ async function downloadJava() {
   const path = await tc.downloadTool(url)
   const extractedFolder = await tc.extractTar(path, 'tools/java/21.0.2')
   const cachedPath = await tc.cacheDir(extractedFolder, 'java', '21.0.2')
-  core.addPath(`${cachedPath}/bin`)
+  core.addPath(`${cachedPath}/jdk-21.0.2/bin`)
 }
 
 async function downloadMaven() {
