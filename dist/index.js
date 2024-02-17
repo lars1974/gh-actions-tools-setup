@@ -60064,24 +60064,61 @@ const cache = __nccwpck_require__(7799)
  */
 async function run() {
   try {
-    const ms = core.getInput('milliseconds', { required: true })
+    const methodCalls = []
 
-    // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
-
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
-
-    await Promise.all([downloadHelm(), downloadJava(), downloadMaven()])
+    for (const param of tools()) {
+      methodCalls.push(downloadTool(param))
+    }
+    await Promise.all(methodCalls)
   } catch (error) {
     // Fail the workflow run if an error occurs
     core.setFailed(error.message)
   }
+}
+
+function tools() {
+  return [
+    {
+      name: 'helm',
+      version: '3.14.1',
+      url: 'https://get.helm.sh/helm-v3.14.1-linux-amd64.tar.gz',
+      pathToExecutable: 'linux-amd64',
+      verify: 'helm version'
+    },
+    {
+      name: 'java',
+      version: '21.0.2',
+      url: 'https://download.java.net/java/GA/jdk21.0.2/f2283984656d49d69e91c558476027ac/13/GPL/openjdk-21.0.2_linux-x64_bin.tar.gz',
+      pathToExecutable: 'jdk-21.0.2/bin',
+      verify: 'java -version',
+      environmentVariable: 'JAVA_HOME=${cachedPath}/jdk-21.0.2/'
+    },
+    {
+      name: 'maven',
+      version: '3.9.6',
+      url: 'https://dlcdn.apache.org/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz',
+      pathToExecutable: 'apache-maven-3.9.6/bin',
+      verify: 'mvn -version'
+    }
+  ]
+}
+
+async function downloadTool(tool) {
+  const path = `tools/${tool.name}/${tool.version}`
+  if ((await cache.restoreCache([path], tool.url, [])) === undefined) {
+    await tc.extractTar(await tc.downloadTool(tool.url), path)
+    await cache.saveCache([path], tool.url)
+  }
+  const cachedPath = await tc.cacheDir(path, tool.name, tool.version)
+  core.addPath(`${cachedPath}/${tool.pathToExecutable}`)
+  if (tool.environmentVariable) {
+    tool.environmentVariable.replace('${cachedPath}', cachedPath)
+    core.exportVariable(
+      tool.environmentVariable.split('=')[0],
+      tool.environmentVariable.split('=')[1]
+    )
+  }
+  //await tool.exec(tool.verify)
 }
 
 async function downloadHelm() {
@@ -60111,6 +60148,7 @@ async function downloadJava() {
   const path = await tc.downloadTool(url)
   const extractedFolder = await tc.extractTar(path, 'tools/java/21.0.2')
   const cachedPath = await tc.cacheDir(extractedFolder, 'java', '21.0.2')
+
   core.info(`cache path: ${cachedPath}`)
   core.addPath(`${cachedPath}/jdk-21.0.2/bin`)
   core.exportVariable('JAVA_HOME', `${cachedPath}/jdk-21.0.2/`)
