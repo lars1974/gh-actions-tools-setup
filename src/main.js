@@ -32,7 +32,8 @@ async function downloadHelm() {
   const helmURL = 'https://get.helm.sh/helm-v3.14.1-linux-amd64.tar.gz'
   const helmPath = await tc.downloadTool(helmURL)
   const helmExtractedFolder = await tc.extractTar(helmPath, 'tools/helm/3.14.1')
-  core.addPath(helmExtractedFolder+'/linux-amd64/helm')
+  const cachedPath = await tc.cacheDir(helmExtractedFolder, 'helm', '3.14.1')
+  core.addPath(`${cachedPath}/linux-amd64`)
 }
 
 async function downloadJava() {
