@@ -56,7 +56,7 @@ async function downloadJava() {
   const path = await tc.downloadTool(url)
   const extractedFolder = await tc.extractTar(path, 'tools/java/21.0.2')
   const cachedPath = await tc.cacheDir(extractedFolder, 'java', '21.0.2')
-  core.info('cache path: ' + cachedPath)
+  core.info(`cache path: ${cachedPath}`)
   core.addPath(`${cachedPath}/jdk-21.0.2/bin`)
   core.exportVariable('JAVA_HOME', `${cachedPath}/jdk-21.0.2/`)
 }
