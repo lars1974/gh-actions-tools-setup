@@ -20,8 +20,8 @@ async function run() {
 
     // Set outputs for other workflow steps to use
     core.setOutput('time', new Date().toTimeString())
-    await downloadHelm()
-    await downloadJava()
+
+    await Promise.all([downloadHelm(), downloadJava(), downloadMaven()])
   } catch (error) {
     // Fail the workflow run if an error occurs
     core.setFailed(error.message)
@@ -40,6 +40,14 @@ async function downloadJava() {
     'https://download.java.net/java/GA/jdk21.0.2/f2283984656d49d69e91c558476027ac/13/GPL/openjdk-21.0.2_linux-x64_bin.tar.gz'
   const path = await tc.downloadTool(url)
   const extractedFolder = await tc.extractTar(path, 'tools/java/21.0.2')
+  core.addPath(extractedFolder)
+}
+
+async function downloadMaven() {
+  const url =
+    'https://dlcdn.apache.org/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz'
+  const path = await tc.downloadTool(url)
+  const extractedFolder = await tc.extractTar(path, 'tools/maven/3.9.6')
   core.addPath(extractedFolder)
 }
 
