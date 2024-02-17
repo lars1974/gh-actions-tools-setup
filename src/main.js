@@ -60,7 +60,7 @@ async function installHelm() {
 
   const cachedPath = await tc.cacheDir(path, 'helm', version)
   core.addPath(`${cachedPath}/${pathToExecutable}`)
-  core.exportVariable('HELM_PLUGIN_DIR', `${cachedPath}/plugins`)
+  core.exportVariable('HELM_PLUGINS', `${cachedPath}/plugins`)
 }
 
 async function downloadTool(tool) {
