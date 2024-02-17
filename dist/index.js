@@ -6639,7 +6639,8 @@ async function downloadMaven() {
     'https://dlcdn.apache.org/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz'
   const path = await tc.downloadTool(url)
   const extractedFolder = await tc.extractTar(path, 'tools/maven/3.9.6')
-  core.addPath(extractedFolder)
+  const cachedPath = await tc.cacheDir(extractedFolder, 'maven', '3.9.6')
+  core.addPath(`${cachedPath}/bin`)
 }
 
 module.exports = {
