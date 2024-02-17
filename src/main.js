@@ -1,5 +1,6 @@
 const core = require('@actions/core')
 const { wait } = require('./wait')
+const tc = require('@actions/tool-cache')
 
 /**
  * The main function for the action.
@@ -19,10 +20,18 @@ async function run() {
 
     // Set outputs for other workflow steps to use
     core.setOutput('time', new Date().toTimeString())
+    await downloadHelm()
   } catch (error) {
     // Fail the workflow run if an error occurs
     core.setFailed(error.message)
   }
+}
+
+async function downloadHelm() {
+  const helmURL = 'https://get.helm.sh/helm-v3.14.1-linux-amd64.tar.gz'
+  const helmPath = await tc.downloadTool(helmURL)
+  const helmExtractedFolder = await tc.extractTar(helmPath, 'tools/helm/3.14.1')
+  core.addPath(helmExtractedFolder)
 }
 
 module.exports = {
