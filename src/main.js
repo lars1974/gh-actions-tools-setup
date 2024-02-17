@@ -60,12 +60,10 @@ async function downloadTool(tool) {
   core.addPath(`${cachedPath}/${tool.pathToExecutable}`)
   core.info('hmm3')
   if (tool.environmentVariable) {
-    core.info('hmm4')
-    tool.environmentVariable.replace('CACHED_PATH', cachedPath)
-    core.exportVariable(
-      tool.environmentVariable.split('=')[0],
-      tool.environmentVariable.split('=')[1]
-    )
+    core.info(`hmm4 tool.environmentVariable: ${tool.environmentVariable}`)
+    const env = tool.environmentVariable.replace('CACHED_PATH', cachedPath)
+
+    core.exportVariable(env.split('=')[0], env.split('=')[1])
     core.info(
       `hmm5${tool.environmentVariable.split('=')[0]}${tool.environmentVariable.split('=')[1]}`
     )

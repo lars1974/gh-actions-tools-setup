@@ -60091,7 +60091,7 @@ function tools() {
       url: 'https://download.java.net/java/GA/jdk21.0.2/f2283984656d49d69e91c558476027ac/13/GPL/openjdk-21.0.2_linux-x64_bin.tar.gz',
       pathToExecutable: 'jdk-21.0.2/bin',
       verify: 'java -version',
-      environmentVariable: 'JAVA_HOME=${cachedPath}/jdk-21.0.2/'
+      environmentVariable: 'JAVA_HOME=CACHED_PATH/jdk-21.0.2/'
     },
     {
       name: 'maven',
@@ -60115,13 +60115,13 @@ async function downloadTool(tool) {
   core.addPath(`${cachedPath}/${tool.pathToExecutable}`)
   core.info('hmm3')
   if (tool.environmentVariable) {
-    core.info('hmm4')
-    tool.environmentVariable.replace('${cachedPath}', cachedPath)
-    core.exportVariable(
-      tool.environmentVariable.split('=')[0],
-      tool.environmentVariable.split('=')[1]
+    core.info(`hmm4 tool.environmentVariable: ${tool.environmentVariable}`)
+    const env = tool.environmentVariable.replace('CACHED_PATH', cachedPath)
+
+    core.exportVariable(env.split('=')[0], env.split('=')[1])
+    core.info(
+      `hmm5${tool.environmentVariable.split('=')[0]}${tool.environmentVariable.split('=')[1]}`
     )
-    core.info('hmm5')
   }
   core.info('hmm6')
   //await tool.exec(tool.verify)
