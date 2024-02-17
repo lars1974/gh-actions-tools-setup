@@ -60070,13 +60070,8 @@ async function run() {
     for (const param of tools()) {
       methodCalls.push(downloadTool(param))
     }
+    methodCalls.push(installHelm())
     await Promise.all(methodCalls)
-
-    await exec.exec('helm', [
-      'plugin',
-      'install',
-      'https://github.com/databus23/helm-diff'
-    ])
   } catch (error) {
     // Fail the workflow run if an error occurs
     core.setFailed(error.message)
@@ -60085,13 +60080,6 @@ async function run() {
 
 function tools() {
   return [
-    {
-      name: 'helm',
-      version: '3.14.1',
-      url: 'https://get.helm.sh/helm-v3.14.1-linux-amd64.tar.gz',
-      pathToExecutable: 'linux-amd64',
-      verify: 'helm version'
-    },
     {
       name: 'java',
       version: '21.0.2',
@@ -60108,6 +60096,26 @@ function tools() {
       verify: 'mvn -version'
     }
   ]
+}
+
+async function installHelm() {
+  const version = '3.6.3'
+  const path = `tools/helm/${version}`
+  const pluginPath = `tools/helm/${version}/plugins`
+  const url = `https://get.helm.sh/helm-v${version}-linux-amd64.tar.gz`
+  const pathToExecutable = 'linux-amd64'
+  const pluginUrl =
+    'https://github.com/databus23/helm-diff/releases/download/v3.9.4/helm-diff-linux-amd64.tgz'
+
+  if ((await cache.restoreCache([path], path, [])) === undefined) {
+    await tc.extractTar(await tc.downloadTool(url), path)
+    await tc.extractTar(await tc.downloadTool(pluginUrl), pluginPath)
+    await cache.saveCache([path], path)
+  }
+
+  const cachedPath = await tc.cacheDir(path, 'helm', version)
+  core.addPath(`${cachedPath}/${pathToExecutable}`)
+  core.exportVariable('HELM_PLUGIN_DIR', `${cachedPath}/plugins`)
 }
 
 async function downloadTool(tool) {
