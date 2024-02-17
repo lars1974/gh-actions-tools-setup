@@ -6610,6 +6610,7 @@ async function run() {
     // Set outputs for other workflow steps to use
     core.setOutput('time', new Date().toTimeString())
     await downloadHelm()
+    await downloadJava()
   } catch (error) {
     // Fail the workflow run if an error occurs
     core.setFailed(error.message)
@@ -6621,6 +6622,14 @@ async function downloadHelm() {
   const helmPath = await tc.downloadTool(helmURL)
   const helmExtractedFolder = await tc.extractTar(helmPath, 'tools/helm/3.14.1')
   core.addPath(helmExtractedFolder)
+}
+
+async function downloadJava() {
+  const url =
+    'https://download.java.net/java/GA/jdk21.0.2/f2283984656d49d69e91c558476027ac/13/GPL/openjdk-21.0.2_linux-x64_bin.tar.gz'
+  const path = await tc.downloadTool(url)
+  const extractedFolder = await tc.extractTar(path, 'tools/java/21.0.2')
+  core.addPath(extractedFolder)
 }
 
 module.exports = {
