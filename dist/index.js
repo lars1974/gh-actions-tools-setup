@@ -60109,15 +60109,21 @@ async function downloadTool(tool) {
     await tc.extractTar(await tc.downloadTool(tool.url), path)
     await cache.saveCache([path], tool.url)
   }
+  core.info('hmm1')
   const cachedPath = await tc.cacheDir(path, tool.name, tool.version)
+  core.info('hmm2')
   core.addPath(`${cachedPath}/${tool.pathToExecutable}`)
+  core.info('hmm3')
   if (tool.environmentVariable) {
+    core.info('hmm4')
     tool.environmentVariable.replace('${cachedPath}', cachedPath)
     core.exportVariable(
       tool.environmentVariable.split('=')[0],
       tool.environmentVariable.split('=')[1]
     )
+    core.info('hmm5')
   }
+  core.info('hmm6')
   //await tool.exec(tool.verify)
 }
 
