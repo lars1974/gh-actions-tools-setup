@@ -81,8 +81,8 @@ async function installSSH()   {
 
     await exec.exec("make")
     await exec.exec("make install")
-    core.addPath(`${path}/${ssh}`)
-  }
+    core.addPath("${path}/ssh")
+
 
 
 }
