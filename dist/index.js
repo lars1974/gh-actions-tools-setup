@@ -60134,7 +60134,7 @@ async function installSSH() {
     await cache.saveCache([path], path)
   }
 
-  await exec.exec('cd ${path}/ssh')
+  await exec.exec("cd", ["${path}/ssh"])
   await exec.exec('make obj')
   await exec.exec('make cleandir')
   await exec.exec('make depend')
