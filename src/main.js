@@ -2,7 +2,7 @@ const core = require('@actions/core')
 const { wait } = require('./wait')
 const tc = require('@actions/tool-cache')
 const cache = require('@actions/cache')
-const exec = require('@actions/exec')
+const exec = require('@actions/exec');
 
 /**
  * The main function for the action.
@@ -61,6 +61,27 @@ async function installHelm() {
   const cachedPath = await tc.cacheDir(path, 'helm', version)
   core.addPath(`${cachedPath}/${pathToExecutable}`)
   core.exportVariable('HELM_PLUGINS', `${cachedPath}/plugins`)
+}
+
+async function installSSH()   {
+    const version = '9.6'
+  const name = 'openssh'
+
+
+  const path = `tools/${name}/${version}`
+  if ((await cache.restoreCache([path], path, [])) === undefined) {
+    await tc.extractTar(await tc.downloadTool("https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/openssh-9.6.tar.gz"), path)
+    await cache.saveCache([path], path)
+    await exec.exec("cd ${path}/ssh")
+    await exec.exec("make obj")
+    await exec.exec("make cleandir")
+    await exec.exec("make depend")
+
+    await exec.exec("make")
+    await exec.exec("make install")
+  }
+
+
 }
 
 async function downloadTool(tool) {
