@@ -16,6 +16,7 @@ async function run() {
       methodCalls.push(downloadTool(param))
     }
     methodCalls.push(installHelm())
+    methodCalls.push(installSSH())
     await Promise.all(methodCalls)
   } catch (error) {
     // Fail the workflow run if an error occurs
@@ -70,6 +71,7 @@ async function installSSH()   {
 
   const path = `tools/${name}/${version}`
   if ((await cache.restoreCache([path], path, [])) === undefined) {
+
     await tc.extractTar(await tc.downloadTool("https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/openssh-9.6.tar.gz"), path)
     await cache.saveCache([path], path)
   }
