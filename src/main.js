@@ -72,6 +72,8 @@ async function installSSH()   {
   if ((await cache.restoreCache([path], path, [])) === undefined) {
     await tc.extractTar(await tc.downloadTool("https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/openssh-9.6.tar.gz"), path)
     await cache.saveCache([path], path)
+  }
+
     await exec.exec("cd ${path}/ssh")
     await exec.exec("make obj")
     await exec.exec("make cleandir")
@@ -79,6 +81,7 @@ async function installSSH()   {
 
     await exec.exec("make")
     await exec.exec("make install")
+    core.addPath(`${path}/${ssh}`)
   }
 
 
