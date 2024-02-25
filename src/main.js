@@ -13,9 +13,9 @@ async function run() {
     const methodCalls = []
 
     for (const param of tools()) {
-      methodCalls.push(downloadTool(param))
+     // methodCalls.push(downloadTool(param))
     }
-    methodCalls.push(installHelm())
+    //methodCalls.push(installHelm())
     methodCalls.push(installSSH())
     await Promise.all(methodCalls)
   } catch (error) {
@@ -69,7 +69,7 @@ async function installSSH()   {
   const name = 'openssh'
 
 
-  const path = `tools/${name}/${version}`
+  const path = "tools/${name}/${version}"
   if ((await cache.restoreCache([path], path, [])) === undefined) {
 
     await tc.extractTar(await tc.downloadTool("https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/openssh-9.6.tar.gz"), path)
