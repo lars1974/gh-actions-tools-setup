@@ -68,7 +68,7 @@ async function installSSH() {
   const version = '9.6'
   const name = 'openssh'
 
-  const path = "tools/${name}/${version}"
+  const path = `tools/${name}/${version}`
   if ((await cache.restoreCache([path], path, [])) === undefined) {
     await tc.extractTar(
       await tc.downloadTool(
@@ -79,16 +79,16 @@ async function installSSH() {
     await cache.saveCache([path], path)
   }
 
-  exec.exec("ls /home/runner/work/gh-action-tools-setup-test/gh-action-tools-setup-test/${path} -la")
+  exec.exec(`ls /home/runner/work/gh-action-tools-setup-test/gh-action-tools-setup-test/${path} -la`)
   core.info("Running configure")
-  await exec.exec("${path}/ssh/make obj")
+  await exec.exec(`${path}/ssh/make obj`)
   core.info("Running make cleandir")
-  await exec.exec("${path}/ssh/make cleandir")
-  await exec.exec("${path}/ssh/make depend")
+  await exec.exec(`${path}/ssh/make cleandir`)
+  await exec.exec(`${path}/ssh/make depend`)
 
-  await exec.exec("${path}/ssh/make")
-  await exec.exec("${path}/ssh/make install")
-  core.addPath("${path}/ssh")
+  await exec.exec(`${path}/ssh/make`)
+  await exec.exec(`${path}/ssh/make install`)
+  core.addPath(`${path}/ssh`)
 }
 
 async function downloadTool(tool) {
