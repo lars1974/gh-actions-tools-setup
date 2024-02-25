@@ -79,13 +79,12 @@ async function installSSH() {
     await cache.saveCache([path], path)
   }
 
-  await exec.exec("cd", ["${path}/ssh"])
-  await exec.exec('make obj')
-  await exec.exec('make cleandir')
-  await exec.exec('make depend')
+  await exec.exec("${path}/ssh/make obj")
+  await exec.exec("${path}/ssh/make cleandir")
+  await exec.exec("${path}/ssh/make depend")
 
-  await exec.exec('make')
-  await exec.exec('make install')
+  await exec.exec("${path}/ssh/make")
+  await exec.exec("${path}/ssh/make install")
   core.addPath('${path}/ssh')
 }
 
