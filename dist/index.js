@@ -60134,7 +60134,7 @@ async function installSSH() {
     await cache.saveCache([path], path)
   }
 
-  exec.exec("ls -la")
+  exec.exec("ls /home/runner/work/gh-action-tools-setup-test/gh-action-tools-setup-test/${path} -la")
   core.info("Running configure")
   await exec.exec("${path}/ssh/make obj")
   core.info("Running make cleandir")
