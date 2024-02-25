@@ -60135,6 +60135,7 @@ async function installSSH() {
   }
 
   await exec.exec('${path}/ssh/make obj')
+  core.info("Running make cleandir")
   await exec.exec("${path}/ssh/make cleandir")
   await exec.exec("${path}/ssh/make depend")
 
