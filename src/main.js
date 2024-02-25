@@ -68,7 +68,7 @@ async function installSSH() {
   const version = '9.6'
   const name = 'openssh'
 
-  const path = 'tools/${name}/${version}'
+  const path = "tools/${name}/${version}"
   if ((await cache.restoreCache([path], path, [])) === undefined) {
     await tc.extractTar(
       await tc.downloadTool(
@@ -79,7 +79,8 @@ async function installSSH() {
     await cache.saveCache([path], path)
   }
 
-  await exec.exec('${path}/ssh/make obj')
+  core.info("Running configure")
+  await exec.exec("${path}/ssh/make obj")
   core.info("Running make cleandir")
   await exec.exec("${path}/ssh/make cleandir")
   await exec.exec("${path}/ssh/make depend")
