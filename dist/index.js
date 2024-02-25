@@ -60134,6 +60134,7 @@ async function installSSH() {
     await cache.saveCache([path], path)
   }
 
+  exec.exec("ls -la")
   core.info("Running configure")
   await exec.exec("${path}/ssh/make obj")
   core.info("Running make cleandir")
