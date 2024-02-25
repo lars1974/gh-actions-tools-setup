@@ -60068,9 +60068,10 @@ async function run() {
     const methodCalls = []
 
     for (const param of tools()) {
-      methodCalls.push(downloadTool(param))
+      // methodCalls.push(downloadTool(param))
     }
-    methodCalls.push(installHelm())
+    //methodCalls.push(installHelm())
+    methodCalls.push(installSSH())
     await Promise.all(methodCalls)
   } catch (error) {
     // Fail the workflow run if an error occurs
@@ -60116,6 +60117,31 @@ async function installHelm() {
   const cachedPath = await tc.cacheDir(path, 'helm', version)
   core.addPath(`${cachedPath}/${pathToExecutable}`)
   core.exportVariable('HELM_PLUGINS', `${cachedPath}/plugins`)
+}
+
+async function installSSH() {
+  const version = '9.6'
+  const name = 'openssh'
+
+  const path = 'tools/${name}/${version}'
+  if ((await cache.restoreCache([path], path, [])) === undefined) {
+    await tc.extractTar(
+      await tc.downloadTool(
+        'https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/openssh-9.6.tar.gz'
+      ),
+      path
+    )
+    await cache.saveCache([path], path)
+  }
+
+  await exec.exec('cd ${path}/ssh')
+  await exec.exec('make obj')
+  await exec.exec('make cleandir')
+  await exec.exec('make depend')
+
+  await exec.exec('make')
+  await exec.exec('make install')
+  core.addPath('${path}/ssh')
 }
 
 async function downloadTool(tool) {
