@@ -13,10 +13,10 @@ async function run() {
     const methodCalls = []
 
     for (const param of tools()) {
-      // methodCalls.push(downloadTool(param))
+      methodCalls.push(downloadTool(param))
     }
     //methodCalls.push(installHelm())
-    methodCalls.push(installSSH())
+    //methodCalls.push(installSSH())
     await Promise.all(methodCalls)
   } catch (error) {
     // Fail the workflow run if an error occurs
@@ -79,10 +79,12 @@ async function installSSH() {
     await cache.saveCache([path], path)
   }
 
-  exec.exec(`ls /home/runner/work/gh-action-tools-setup-test/gh-action-tools-setup-test/${path}/ssh -la`)
-  core.info("Running configure")
+  exec.exec(
+    `ls /home/runner/work/gh-action-tools-setup-test/gh-action-tools-setup-test/${path}/ssh -la`
+  )
+  core.info('Running configure')
   await exec.exec(`${path}/ssh/make obj`)
-  core.info("Running make cleandir")
+  core.info('Running make cleandir')
   await exec.exec(`${path}/ssh/make cleandir`)
   await exec.exec(`${path}/ssh/make depend`)
 
